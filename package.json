@@ -19,7 +19,17 @@
         "command": "uwap.releasecollector.publish",
         "title": "Publish and collect"
       }
-    ]
+    ],
+    "configuration": {
+      "title": "ReleaseCollector",
+      "properties": {
+        "UWAP.releasecollector.deleteReleaseFolder": {
+          "type": "boolean",
+          "default": true,
+          "description": "Whether or not the folders \"bin/Release\" and \"obj/Release\" should be deleted after publishing."
+        }
+      }
+    }
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",

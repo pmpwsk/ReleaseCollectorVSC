@@ -103,9 +103,12 @@ async function publish() {
             versionString = vSelection;
         }
     }
-    var releaseUri = vscode.Uri.joinPath(projUri, "bin", "Release");
-    if (await fs.exists(releaseUri))
-        fs.deleteDirectory(releaseUri);
+    var binReleaseUri = vscode.Uri.joinPath(projUri, "bin", "Release");
+    if (await fs.exists(binReleaseUri))
+        await fs.deleteDirectory(binReleaseUri);
+    var objReleaseUri = vscode.Uri.joinPath(projUri, "obj", "Release");
+    if (await fs.exists(objReleaseUri))
+        await fs.deleteDirectory(objReleaseUri);
     var targetUri;
     if (versionString !== null) {
         var publishUri = vscode.Uri.joinPath(projUri, "bin", "Publish");
@@ -143,8 +146,8 @@ async function publish() {
                     vscode.window.showErrorMessage(`Invalid runtime line '${line}'!`);
                     continue;
             }
-            netUri ??= vscode.Uri.joinPath(releaseUri, (await fs.getDirectoryNames(releaseUri))[0]);
-            var sourceUri = vscode.Uri.joinPath(releaseUri, (await fs.getDirectoryNames(releaseUri))[0], runtimeSegments[0], "publish");
+            netUri ??= vscode.Uri.joinPath(binReleaseUri, (await fs.getDirectoryNames(binReleaseUri))[0]);
+            var sourceUri = vscode.Uri.joinPath(binReleaseUri, (await fs.getDirectoryNames(binReleaseUri))[0], runtimeSegments[0], "publish");
             var executableName = runtimeSegments[0].includes("win") ? `${projName}.exe` : projName;
             if (!await fs.exists(vscode.Uri.joinPath(sourceUri, executableName))) {
                 vscode.window.showErrorMessage("Build failed!");
@@ -163,16 +166,22 @@ async function publish() {
     }
     else {
         await run(projUri, "dotnet build -c Release");
-        var dllUri = vscode.Uri.joinPath(releaseUri, (await fs.getDirectoryNames(releaseUri))[0], `${projName}.dll`);
+        var dllUri = vscode.Uri.joinPath(binReleaseUri, (await fs.getDirectoryNames(binReleaseUri))[0], `${projName}.dll`);
         if (!await fs.exists(dllUri)) {
             vscode.window.showErrorMessage("Build failed!");
             break main;
         }
         await fs.copy(dllUri, vscode.Uri.joinPath(targetUri, `${projName}${versionSuffix}.dll`));
-        var nupkgs = (await fs.getFileNames(releaseUri)).filter(x => x.endsWith(".nupkg"));
+        var nupkgs = (await fs.getFileNames(binReleaseUri)).filter(x => x.endsWith(".nupkg"));
         if (nupkgs.length > 0)
-            await fs.copy(vscode.Uri.joinPath(releaseUri, nupkgs[0]), vscode.Uri.joinPath(targetUri, nupkgs[0]));
+            await fs.copy(vscode.Uri.joinPath(binReleaseUri, nupkgs[0]), vscode.Uri.joinPath(targetUri, nupkgs[0]));
         vscode.window.showInformationMessage("Success!");
+    }
+    if (vscode.workspace.getConfiguration().get("UWAP.releasecollector.deleteReleaseFolder")) {
+        if (await fs.exists(binReleaseUri))
+            await fs.deleteDirectory(binReleaseUri);
+        if (await fs.exists(objReleaseUri))
+            await fs.deleteDirectory(objReleaseUri);
     }
     if (hasPublishFile) {
         await fs.move(vscode.Uri.joinPath(projUri, `${projName}.csproj`), vscode.Uri.joinPath(projUri, `${projName}.csproj-publish`));
@@ -216,7 +225,7 @@ function versionToString(version) {
 async function zip(directoryUri, zipUri, executableName) {
     var zip = new jszip_1.default();
     await addToZip(zip, directoryUri, executableName);
-    fs.writeBytes(zipUri, await zip.generateAsync({ type: "uint8array", compression: "DEFLATE", compressionOptions: { level: 9 }, platform: process.platform === "win32" ? "DOS" : "UNIX" }));
+    await fs.writeBytes(zipUri, await zip.generateAsync({ type: "uint8array", compression: "DEFLATE", compressionOptions: { level: 9 }, platform: process.platform === "win32" ? "DOS" : "UNIX" }));
 }
 async function addToZip(zip, path, executableName) {
     for (var x of await fs.getDirectoryNames(path)) {
