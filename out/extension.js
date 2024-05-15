@@ -124,7 +124,7 @@ async function publish() {
     var versionSuffix = versionString === null ? "" : `-${versionString}`;
     main: if (csprojCode.includes("<OutputType>Exe</OutputType>") || csprojCode.includes("<Project Sdk=\"Microsoft.NET.Sdk.Web\">")) {
         var netUri = null;
-        var configUri = vscode.Uri.joinPath(projUri, "ReleaseCollector.config");
+        var configUri = vscode.Uri.joinPath(projUri, "ReleaseCollector.conf");
         for (var line of await fs.exists(configUri) ? await fs.readLines(configUri) : ["linux-arm64_fd", "linux-x64_fd", "osx-arm64_fd", "osx-x64_fd", "win-arm64_fd", "win-x64_fd", "linux-arm64_sc", "linux-x64_sc", "osx-arm64_sc", "osx-x64_sc", "win-arm64_sc", "win-x64_sc"]) {
             line = line.trim();
             if (line === "")
@@ -238,7 +238,7 @@ async function addToZip(zip, path, executableName) {
     for (var x of await fs.getFileNames(path))
         if (x === executableName)
             zip.file(x, await fs.readBytes(vscode.Uri.joinPath(path, x)), { unixPermissions: "744" });
-        else if (executableName === null || x !== "ReleaseCollector.config")
+        else
             zip.file(x, await fs.readBytes(vscode.Uri.joinPath(path, x)));
 }
 //# sourceMappingURL=extension.js.map
