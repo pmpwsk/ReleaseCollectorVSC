@@ -1,10 +1,10 @@
 {
   "name": "uwap-releasecollector-vsc",
   "displayName": "ReleaseCollector",
-  "description": "Publishes the project for different systems and collects them in bin/v... with the highest version number.",
+  "description": "Visual Studio Code extension that builds your .NET project for various systems and collects the files in one folder.",
   "icon": "u.ico",
   "publisher": "uwap-org",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "engines": {
     "vscode": "^1.87.0"
   },
