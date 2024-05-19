@@ -71,8 +71,8 @@ async function publish() {
 			return;
 		}
 		if (versionString !== vSelection) {
-			await fs.writeText(vscode.Uri.joinPath(projUri, "test.txt"), versionBefore + versionString + versionAfter);
 			versionString = vSelection;
+			await fs.writeText(vscode.Uri.joinPath(projUri, `${projName}.csproj`), versionBefore + versionString + versionAfter);
 		}
 	}
 	var binReleaseUri = vscode.Uri.joinPath(projUri, "bin", "Release");
