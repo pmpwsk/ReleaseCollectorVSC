@@ -4,7 +4,7 @@
   "description": "Visual Studio Code extension that builds your .NET project for various systems and collects the files in one folder.",
   "icon": "u.ico",
   "publisher": "uwap-org",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "engines": {
     "vscode": "^1.87.0"
   },
