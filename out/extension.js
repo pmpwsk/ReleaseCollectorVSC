@@ -233,7 +233,7 @@ async function addToZip(zip, path, executableName) {
         if (folder === null)
             vscode.window.showErrorMessage(`'${path.fsPath}' could not be added to a .zip file!`);
         else
-            addToZip(folder, vscode.Uri.joinPath(path, x), null);
+            await addToZip(folder, vscode.Uri.joinPath(path, x), null);
     }
     for (var x of await fs.getFileNames(path))
         if (x === executableName)

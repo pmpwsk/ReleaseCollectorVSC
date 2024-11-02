@@ -203,10 +203,10 @@ async function zip(directoryUri : vscode.Uri, zipUri : vscode.Uri, executableNam
 
 async function addToZip(zip : JSZip, path : vscode.Uri, executableName : string | null) : Promise<void> {
 	for (var x of await fs.getDirectoryNames(path)) {
-		var folder = zip.folder(x)
+		var folder = zip.folder(x);
 		if (folder === null)
 			vscode.window.showErrorMessage(`'${path.fsPath}' could not be added to a .zip file!`);
-		else addToZip(folder, vscode.Uri.joinPath(path, x), null);
+		else await addToZip(folder, vscode.Uri.joinPath(path, x), null);
 	}
 	for (var x of await fs.getFileNames(path))
 		if (x === executableName)
